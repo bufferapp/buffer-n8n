@@ -1,6 +1,6 @@
 {
 	"name": "@bufferapp/n8n-nodes-buffer",
-	"version": "3.5.0",
+	"version": "3.6.0",
 	"description": "n8n nodes for Buffer - Create and manage ideas and posts in your Buffer account",
 	"license": "MIT",
 	"homepage": "https://github.com/bufferapp/buffer-n8n",
