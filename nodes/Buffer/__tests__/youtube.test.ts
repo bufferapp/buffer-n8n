@@ -102,5 +102,23 @@ describe('Buffer Node - Create Post', () => {
 			});
 			expect(input.schedulingType).toBe('notification');
 		});
+
+		it('should not build youtube metadata when scheduling mode is notification', async () => {
+			const input = await executePostCreate({
+				...youtubeDefaults,
+				schedulingType: 'notification',
+			});
+			expect(input.metadata).toBeUndefined();
+		});
+
+		it('should not require a title when scheduling mode is notification', async () => {
+			await expect(
+				executePostCreate({
+					...youtubeDefaults,
+					youtubeTitle: '',
+					schedulingType: 'notification',
+				}),
+			).resolves.not.toThrow();
+		});
 	});
 });

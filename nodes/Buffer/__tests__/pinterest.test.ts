@@ -23,13 +23,23 @@ describe('Buffer Node - Create Post', () => {
 			).rejects.toThrow('Pinterest posts require a Board');
 		});
 
-		it('should throw an error when there is no image or video attachment', async () => {
+		it('should throw an error when there is no image attachment', async () => {
 			await expect(
 				executePostCreate({
 					...pinterestDefaults,
 					attachmentType: 'none',
 				}),
-			).rejects.toThrow('Pinterest posts require an image or video attachment');
+			).rejects.toThrow('Pinterest posts require an image attachment');
+		});
+
+		it('should throw an error when a video attachment is selected', async () => {
+			await expect(
+				executePostCreate({
+					...pinterestDefaults,
+					attachmentType: 'video',
+					videoUrl: 'https://example.com/video.mp4',
+				}),
+			).rejects.toThrow('Pinterest posts do not support video attachments');
 		});
 
 		it('should throw an error when there is no text', async () => {
@@ -64,15 +74,6 @@ describe('Buffer Node - Create Post', () => {
 			const meta = (input.metadata as IDataObject).pinterest as IDataObject;
 			expect(meta).not.toHaveProperty('title');
 			expect(meta).not.toHaveProperty('url');
-		});
-
-		it('should succeed with a video attachment', async () => {
-			const input = await executePostCreate({
-				...pinterestDefaults,
-				attachmentType: 'video',
-				videoUrl: 'https://example.com/video.mp4',
-			});
-			expect(input.assets).toEqual([{ video: { url: 'https://example.com/video.mp4' } }]);
 		});
 
 		it('should force schedulingType to automatic regardless of the field value', async () => {

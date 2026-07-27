@@ -236,14 +236,16 @@ export const postCoreProperties: INodeProperties[] = [
 	},
 ];
 
-// The three attachmentType field variants: generic (hidden for YouTube/Google Business),
-// YouTube-only (forces 'video'), and Google Business-only (no video option).
+// The four attachmentType field variants: generic (hidden for YouTube/Google Business/Pinterest),
+// YouTube-only (forces 'video'), Google Business-only (no video option), and Pinterest-only
+// (forces 'image').
 export const postAttachmentProperties: INodeProperties[] = [
 	{
-		// YouTube posts are always videos, and Google Business does not support video, so
-		// this field is hidden for those channels and replaced with the network-specific
-		// fields below (see the Scheduling Mode fields above for why this uses field-level
-		// displayOptions rather than per-option displayOptions).
+		// YouTube posts are always videos, Google Business does not support video, and
+		// Pinterest posts are always images, so this field is hidden for those channels and
+		// replaced with the network-specific fields below (see the Scheduling Mode fields
+		// above for why this uses field-level displayOptions rather than per-option
+		// displayOptions).
 		displayName: 'Attachment Type',
 		name: 'attachmentType',
 		type: 'options',
@@ -273,6 +275,7 @@ export const postAttachmentProperties: INodeProperties[] = [
 				channelService: [
 					'youtube', 'YouTube', 'YOUTUBE',
 					'google', 'Google', 'GOOGLE', 'googlebusiness', 'GoogleBusiness', 'GOOGLEBUSINESS', 'google_business', 'Google_Business', 'GOOGLE_BUSINESS',
+					'pinterest', 'Pinterest', 'PINTEREST',
 				],
 			},
 		},
@@ -325,6 +328,27 @@ export const postAttachmentProperties: INodeProperties[] = [
 		},
 		default: 'none',
 		description: 'Google Business posts do not support video attachments',
+	},
+	{
+		displayName: 'Attachment Type',
+		name: 'attachmentType',
+		type: 'options',
+		options: [
+			{
+				name: 'Image',
+				value: 'image',
+				description: 'Create a post with an image',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['post'],
+				operation: ['create'],
+				channelService: ['pinterest', 'Pinterest', 'PINTEREST'],
+			},
+		},
+		default: 'image',
+		description: 'Pinterest posts always require an image attachment',
 	},
 ];
 

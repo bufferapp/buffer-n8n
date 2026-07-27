@@ -1,8 +1,9 @@
 import type { IExecuteFunctions, IDataObject } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
-// Pinterest posts require an image/video attachment and text (the Board requirement is
-// enforced separately in buildPinterestMetadata, since it needs the loaded board value).
+// Pinterest posts require an image attachment (video is not supported) and text (the
+// Board requirement is enforced separately in buildPinterestMetadata, since it needs the
+// loaded board value).
 export function validatePinterest(
 	ctx: IExecuteFunctions,
 	itemIndex: number,
@@ -12,7 +13,14 @@ export function validatePinterest(
 	if (attachmentType === 'none') {
 		throw new NodeOperationError(
 			ctx.getNode(),
-			'Pinterest posts require an image or video attachment.',
+			'Pinterest posts require an image attachment.',
+			{ itemIndex },
+		);
+	}
+	if (attachmentType === 'video') {
+		throw new NodeOperationError(
+			ctx.getNode(),
+			'Pinterest posts do not support video attachments. Please use an image.',
 			{ itemIndex },
 		);
 	}

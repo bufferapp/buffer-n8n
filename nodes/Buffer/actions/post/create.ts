@@ -87,7 +87,10 @@ export async function createPost(
 		input.metadata = { instagram: buildInstagramMetadata(ctx, i, isInstagramProfile) };
 	} else if (channelService && channelService.toLowerCase() === 'facebook') {
 		input.metadata = { facebook: buildFacebookMetadata(ctx, i, isFacebookGroup) };
-	} else if (channelService && channelService.toLowerCase() === 'youtube') {
+	} else if (channelService && channelService.toLowerCase() === 'youtube' && schedulingType !== 'notification') {
+		// YouTube-specific fields (title, category, privacy, license, etc.) only apply when the
+		// video will actually be published; they're hidden from the UI and unused when the
+		// scheduling mode is "Notification" (manual publish).
 		input.metadata = { youtube: buildYoutubeMetadata(ctx, i) };
 	} else if (channelService && ['google', 'googlebusiness', 'google_business'].includes(channelService.toLowerCase())) {
 		input.metadata = { google: buildGoogleBusinessMetadata(ctx, i) };

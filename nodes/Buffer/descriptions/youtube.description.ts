@@ -11,6 +11,9 @@ export const youtubeProperties: INodeProperties[] = [
 				operation: ['create'],
 				channelService: ['youtube', 'YouTube', 'YOUTUBE'],
 			},
+			hide: {
+				schedulingType: ['notification'],
+			},
 		},
 		default: '',
 		description: 'The title of the YouTube video',
@@ -42,6 +45,9 @@ export const youtubeProperties: INodeProperties[] = [
 				operation: ['create'],
 				channelService: ['youtube', 'YouTube', 'YOUTUBE'],
 			},
+			hide: {
+				schedulingType: ['notification'],
+			},
 		},
 		default: '22',
 		description: 'The YouTube category ID for the video',
@@ -61,6 +67,9 @@ export const youtubeProperties: INodeProperties[] = [
 				operation: ['create'],
 				channelService: ['youtube', 'YouTube', 'YOUTUBE'],
 			},
+			hide: {
+				schedulingType: ['notification'],
+			},
 		},
 		default: 'public',
 		description: 'The privacy status of the YouTube video',
@@ -79,6 +88,9 @@ export const youtubeProperties: INodeProperties[] = [
 				operation: ['create'],
 				channelService: ['youtube', 'YouTube', 'YOUTUBE'],
 			},
+			hide: {
+				schedulingType: ['notification'],
+			},
 		},
 		default: 'youtube',
 		description: 'The license under which the video is shared',
@@ -92,6 +104,9 @@ export const youtubeProperties: INodeProperties[] = [
 				resource: ['post'],
 				operation: ['create'],
 				channelService: ['youtube', 'YouTube', 'YOUTUBE'],
+			},
+			hide: {
+				schedulingType: ['notification'],
 			},
 		},
 		default: false,
@@ -107,6 +122,9 @@ export const youtubeProperties: INodeProperties[] = [
 				operation: ['create'],
 				channelService: ['youtube', 'YouTube', 'YOUTUBE'],
 			},
+			hide: {
+				schedulingType: ['notification'],
+			},
 		},
 		default: true,
 		description: 'Whether the video can be embedded on other websites',
@@ -120,6 +138,9 @@ export const youtubeProperties: INodeProperties[] = [
 				resource: ['post'],
 				operation: ['create'],
 				channelService: ['youtube', 'YouTube', 'YOUTUBE'],
+			},
+			hide: {
+				schedulingType: ['notification'],
 			},
 		},
 		default: true,
