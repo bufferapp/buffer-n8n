@@ -23,9 +23,9 @@ export async function executePostCreate(params: Record<string, unknown>) {
 
 	const mockContext = {
 		getInputData: () => [{ json: {} }],
-		getNodeParameter: (name: string) => {
+		getNodeParameter: (name: string, _itemIndex: number, fallback?: unknown) => {
 			if (!(name in defaults)) {
-				return '';
+				return fallback !== undefined ? fallback : '';
 			}
 			return defaults[name];
 		},
@@ -103,10 +103,10 @@ export async function runExecute(
 
 	const mockContext = {
 		getInputData: () => itemsDefaults.map(() => ({ json: {} })),
-		getNodeParameter: (name: string, itemIndex: number) => {
+		getNodeParameter: (name: string, itemIndex: number, fallback?: unknown) => {
 			const defaults = itemsDefaults[itemIndex];
 			if (!defaults || !(name in defaults)) {
-				return '';
+				return fallback !== undefined ? fallback : '';
 			}
 			return defaults[name];
 		},

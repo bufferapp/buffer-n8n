@@ -1,11 +1,10 @@
 import type { INodeProperties } from 'n8n-workflow';
 
-// Resource, Post's Operation field, core post fields (channel/text/scheduling), and both
-// schedulingType field variants (see the comment on the field below for why there are two).
-export const postCoreProperties: INodeProperties[] = [
-	// ----------------------------------
-	//         Resources
-	// ----------------------------------
+// The Resource selector, kept as its own export so it can be placed first in the concatenated
+// properties array (see descriptions/index.ts) — it must come before the Idea/Post-specific
+// fields it controls, otherwise those fields render above it once "Idea" (the default) is
+// selected, pushing the selector out of its expected position in the n8n UI.
+export const resourceProperty: INodeProperties[] = [
 	{
 		displayName: 'Resource',
 		name: 'resource',
@@ -23,6 +22,11 @@ export const postCoreProperties: INodeProperties[] = [
 		],
 		default: 'idea',
 	},
+];
+
+// Post's Operation field, core post fields (channel/text/scheduling), and both schedulingType
+// field variants (see the comment on the field below for why there are two).
+export const postCoreProperties: INodeProperties[] = [
 	// ----------------------------------
 	//         Operations
 	// ----------------------------------
@@ -236,52 +240,15 @@ export const postCoreProperties: INodeProperties[] = [
 	},
 ];
 
-// The four attachmentType field variants: generic (hidden for YouTube/Google Business/Pinterest),
-// YouTube-only (forces 'video'), Google Business-only (no video option), and Pinterest-only
-// (forces 'image').
+// The four attachmentType field variants: YouTube-only (forces 'video'), Google Business-only
+// (no video option), Pinterest-only (forces 'image'), and generic (hidden for those three
+// channels). The generic variant is deliberately listed LAST: n8n resolves a duplicate-named
+// field's initial default (before an org/channel has been selected, so channelService is empty
+// and no displayOptions match yet) from the LAST matching property definition in the array,
+// not by evaluating displayOptions. Listing the generic 'none' variant last ensures a freshly
+// added node defaults to "No Attachment" instead of whichever network-specific variant happens
+// to be last.
 export const postAttachmentProperties: INodeProperties[] = [
-	{
-		// YouTube posts are always videos, Google Business does not support video, and
-		// Pinterest posts are always images, so this field is hidden for those channels and
-		// replaced with the network-specific fields below (see the Scheduling Mode fields
-		// above for why this uses field-level displayOptions rather than per-option
-		// displayOptions).
-		displayName: 'Attachment Type',
-		name: 'attachmentType',
-		type: 'options',
-		options: [
-			{
-				name: 'No Attachment',
-				value: 'none',
-				description: 'Create a text-only post',
-			},
-			{
-				name: 'Image',
-				value: 'image',
-				description: 'Create a post with an image',
-			},
-			{
-				name: 'Video',
-				value: 'video',
-				description: 'Create a post with a video',
-			},
-		],
-		displayOptions: {
-			show: {
-				resource: ['post'],
-				operation: ['create'],
-			},
-			hide: {
-				channelService: [
-					'youtube', 'YouTube', 'YOUTUBE',
-					'google', 'Google', 'GOOGLE', 'googlebusiness', 'GoogleBusiness', 'GOOGLEBUSINESS', 'google_business', 'Google_Business', 'GOOGLE_BUSINESS',
-					'pinterest', 'Pinterest', 'PINTEREST',
-				],
-			},
-		},
-		default: 'none',
-		description: 'Type of attachment to add to the post',
-	},
 	{
 		displayName: 'Attachment Type',
 		name: 'attachmentType',
@@ -349,6 +316,48 @@ export const postAttachmentProperties: INodeProperties[] = [
 		},
 		default: 'image',
 		description: 'Pinterest posts always require an image attachment',
+	},
+	{
+		// YouTube posts are always videos, Google Business does not support video, and
+		// Pinterest posts are always images, so this field is hidden for those channels and
+		// replaced with the network-specific fields above (see the Scheduling Mode fields
+		// above for why this uses field-level displayOptions rather than per-option
+		// displayOptions).
+		displayName: 'Attachment Type',
+		name: 'attachmentType',
+		type: 'options',
+		options: [
+			{
+				name: 'No Attachment',
+				value: 'none',
+				description: 'Create a text-only post',
+			},
+			{
+				name: 'Image',
+				value: 'image',
+				description: 'Create a post with an image',
+			},
+			{
+				name: 'Video',
+				value: 'video',
+				description: 'Create a post with a video',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['post'],
+				operation: ['create'],
+			},
+			hide: {
+				channelService: [
+					'youtube', 'YouTube', 'YOUTUBE',
+					'google', 'Google', 'GOOGLE', 'googlebusiness', 'GoogleBusiness', 'GOOGLEBUSINESS', 'google_business', 'Google_Business', 'GOOGLE_BUSINESS',
+					'pinterest', 'Pinterest', 'PINTEREST',
+				],
+			},
+		},
+		default: 'none',
+		description: 'Type of attachment to add to the post',
 	},
 ];
 
