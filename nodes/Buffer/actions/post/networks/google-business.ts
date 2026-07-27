@@ -46,34 +46,54 @@ export function buildGoogleBusinessMetadata(ctx: IExecuteFunctions, itemIndex: n
 		const title = ctx.getNodeParameter('googleEventTitle', itemIndex) as string;
 		const startDate = ctx.getNodeParameter('googleEventStartDate', itemIndex) as string;
 		const endDate = ctx.getNodeParameter('googleEventEndDate', itemIndex) as string;
-		const hasTime = ctx.getNodeParameter('googleEventHasTime', itemIndex) as boolean;
 		const button = ctx.getNodeParameter('googleEventButton', itemIndex) as string;
 		const link = ctx.getNodeParameter('googleEventLink', itemIndex) as string;
 
+		// Workflows saved before "Specify Event Time" replaced the old "Full Day Event"
+		// toggle still carry a `googleEventIsFullDay` value in their stored parameters,
+		// even though that field no longer exists in this node's UI. The old behavior
+		// always sent the full start/end date-time and used this flag only to set
+		// isFullDayEvent, so replicate that exactly here rather than falling through to
+		// the new hasTime logic - otherwise old timed events would silently become
+		// all-day events (isFullDayEvent would flip from false to true) after upgrading.
+		const legacyIsFullDay = ctx.getNodeParameter('googleEventIsFullDay', itemIndex, null) as
+			| boolean
+			| null;
+
 		let eventStartDate: string;
 		let eventEndDate: string;
-		if (hasTime) {
-			const startTime = ctx.getNodeParameter('googleEventStartTime', itemIndex) as string;
-			const endTime = ctx.getNodeParameter('googleEventEndTime', itemIndex) as string;
-			if (!startTime || !endTime) {
-				throw new NodeOperationError(
-					ctx.getNode(),
-					'Please provide both an "Event Start Time" and "Event End Time", or disable "Specify Event Time" to create an all-day event.',
-					{ itemIndex },
-				);
-			}
-			if (!TIME_FORMAT_REGEX.test(startTime) || !TIME_FORMAT_REGEX.test(endTime)) {
-				throw new NodeOperationError(
-					ctx.getNode(),
-					'Event times must be in 24-hour HH:mm format, e.g. 14:30.',
-					{ itemIndex },
-				);
-			}
-			eventStartDate = combineDateAndTime(startDate, startTime);
-			eventEndDate = combineDateAndTime(endDate, endTime);
+		let isFullDayEvent: boolean;
+
+		if (legacyIsFullDay !== null) {
+			eventStartDate = new Date(startDate).toISOString();
+			eventEndDate = new Date(endDate).toISOString();
+			isFullDayEvent = legacyIsFullDay;
 		} else {
-			eventStartDate = toDateOnlyIso(startDate);
-			eventEndDate = toDateOnlyIso(endDate);
+			const hasTime = ctx.getNodeParameter('googleEventHasTime', itemIndex) as boolean;
+			if (hasTime) {
+				const startTime = ctx.getNodeParameter('googleEventStartTime', itemIndex) as string;
+				const endTime = ctx.getNodeParameter('googleEventEndTime', itemIndex) as string;
+				if (!startTime || !endTime) {
+					throw new NodeOperationError(
+						ctx.getNode(),
+						'Please provide both an "Event Start Time" and "Event End Time", or disable "Specify Event Time" to create an all-day event.',
+						{ itemIndex },
+					);
+				}
+				if (!TIME_FORMAT_REGEX.test(startTime) || !TIME_FORMAT_REGEX.test(endTime)) {
+					throw new NodeOperationError(
+						ctx.getNode(),
+						'Event times must be in 24-hour HH:mm format, e.g. 14:30.',
+						{ itemIndex },
+					);
+				}
+				eventStartDate = combineDateAndTime(startDate, startTime);
+				eventEndDate = combineDateAndTime(endDate, endTime);
+			} else {
+				eventStartDate = toDateOnlyIso(startDate);
+				eventEndDate = toDateOnlyIso(endDate);
+			}
+			isFullDayEvent = !hasTime;
 		}
 
 		if (title) googleMeta.title = title;
@@ -81,7 +101,7 @@ export function buildGoogleBusinessMetadata(ctx: IExecuteFunctions, itemIndex: n
 			title,
 			startDate: eventStartDate,
 			endDate: eventEndDate,
-			isFullDayEvent: !hasTime,
+			isFullDayEvent,
 		};
 		if (button) details.button = button;
 		if (link) details.link = link;

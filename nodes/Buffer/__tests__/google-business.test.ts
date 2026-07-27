@@ -253,6 +253,37 @@ describe('Buffer Node - Create Post', () => {
 				}),
 			).rejects.toThrow('Google Business posts do not support video attachments');
 		});
+
+		// Workflows saved before "Specify Event Time" replaced the old "Full Day
+		// Event" toggle still have a `googleEventIsFullDay` value stored on the node,
+		// even though it's no longer part of this node's UI. These tests simulate
+		// that legacy saved shape to make sure old timed events don't silently
+		// become all-day events after upgrading.
+		describe('legacy googleEventIsFullDay workflows', () => {
+			it('should send the full start/end date-time and keep isFullDayEvent false for a legacy timed event', async () => {
+				const input = await executePostCreate({
+					...googleEventDefaults,
+					googleEventIsFullDay: false,
+				});
+				const meta = (input.metadata as IDataObject).google as IDataObject;
+				const details = meta.detailsEvent as IDataObject;
+				expect(details.startDate).toBe('2026-07-01T10:00:00.000Z');
+				expect(details.endDate).toBe('2026-07-01T18:00:00.000Z');
+				expect(details.isFullDayEvent).toBe(false);
+			});
+
+			it('should send the full start/end date-time and keep isFullDayEvent true for a legacy all-day event', async () => {
+				const input = await executePostCreate({
+					...googleEventDefaults,
+					googleEventIsFullDay: true,
+				});
+				const meta = (input.metadata as IDataObject).google as IDataObject;
+				const details = meta.detailsEvent as IDataObject;
+				expect(details.startDate).toBe('2026-07-01T10:00:00.000Z');
+				expect(details.endDate).toBe('2026-07-01T18:00:00.000Z');
+				expect(details.isFullDayEvent).toBe(true);
+			});
+		});
 	});
 
 	// -------------------------------------------------------
