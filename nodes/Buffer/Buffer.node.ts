@@ -3,7 +3,9 @@ import type {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	JsonObject,
 } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionTypes } from 'n8n-workflow';
 import { getApiUrl } from './transport/graphql';
 import { properties } from './descriptions';
 import { loadOptions } from './methods/loadOptions';
@@ -25,8 +27,8 @@ export class Buffer implements INodeType {
 		defaults: {
 			name: 'Buffer',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		usableAsTool: true,
 		credentials: [
 			{
@@ -68,7 +70,7 @@ export class Buffer implements INodeType {
 					});
 					continue;
 				}
-				throw error;
+				throw new NodeApiError(this.getNode(), error as JsonObject);
 			}
 		}
 
