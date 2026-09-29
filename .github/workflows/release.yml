@@ -28,6 +28,9 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
@@ -46,7 +49,7 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish --ignore-scripts --provenance --access public
+        run: npm publish --ignore-scripts --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
